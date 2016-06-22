@@ -4,7 +4,7 @@ import sklearn
 import sys
 
 norm = np.linalg.norm
-epsilon = 0.001
+epsilon = 0.01
 
 def umkl_descent(kernels, rho):
     n = kernels[0].shape[0]
@@ -22,28 +22,19 @@ def umkl_descent(kernels, rho):
 
     m = K.shape[1]
 
-    # Objective function
-    def obj_func(U):
-        t1 = rho*sum([norm(U[i,:]) for i in range(m)])
-        M = np.eye(n)
-        for i in range(m):
-            M -= np.outer(K[:,i], U[i,:])
-        t2 = norm(M, 'fro')
-        return t1 + t2
-
     U = np.random.randn(m, n)
+    obj_term1 = rho*sum([norm(U[i,:]) for i in range(m)])
 
     Z = np.eye(n)
     for i in range(m):
         Z -= np.outer(K[:,i], U[i,:])
+    
+    prev_obj = obj_term1 + norm(Z, 'fro')
 
-    # TODO: currently checking convergence of objective value,
-    # possibly cheaper to check convergence of coordinates
     converged = False
     while not converged:
         for i in range(m):
             Z += np.outer(K[:,i], U[i,:])
-            old_obj = obj_func(U)
 
             # Actual descent
             a = norm(np.dot(K[:,i].T, Z))**2
@@ -51,20 +42,28 @@ def umkl_descent(kernels, rho):
             c = norm(K[:,i])**2
             d = (rho**2) - c
             alpha = ( a*d + np.sqrt( (a*d)**2 - a*c*d*( (rho**2)*b - a ) ) ) / (a*c*d)
-            U[i,:] = alpha * np.dot(K[:,i].T,  Z)
 
-            new_obj = obj_func(U)
-            diff = old_obj - new_obj
+            # Update objective value
+            temp = obj_term1 - rho*norm(U[i,:])
+            U[i,:] = alpha * np.dot(K[:,i].T,  Z)
+            temp += rho*norm(U[i,:])
+            obj_term1 = temp
+
+            Z -= np.outer(K[:,i], U[i,:])
+            new_obj = obj_term1 + norm(Z, 'fro')
+
+            diff = prev_obj - new_obj
             print diff
             if diff < epsilon:
                 converged = True
             else:
                 converged = False
 
-            Z -= np.outer(K[:,i], U[i,:])
+            prev_obj = new_obj
+
 
     
-    Phi = obj_func(U)
+    Phi = new_obj
     weights = [ norm(Z, 'fro')/Phi ]
 
     for i in range(1,m):
