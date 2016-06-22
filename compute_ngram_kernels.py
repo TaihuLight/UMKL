@@ -19,7 +19,7 @@ with open(raw_corpus, 'r') as f:
         corpus.append(json.loads(l)['reviewText'])
 
 # TODO: For now, we'll take a small corpus. Scalability will come later.
-corpus = corpus[:1000]
+corpus = corpus[:100]
 
 # Initialize vectorizers
 unigram_vectorizer = CountVectorizer()
