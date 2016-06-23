@@ -4,9 +4,8 @@ import sklearn
 import sys
 
 norm = np.linalg.norm
-epsilon = 0.01
 
-def umkl_descent(kernels, rho):
+def umkl_descent(kernels, rho, epsilon=0.1):
     n = kernels[0].shape[0]
     
     # Obtain k_i from eigenvalue decompositions 
@@ -31,8 +30,8 @@ def umkl_descent(kernels, rho):
     
     prev_obj = obj_term1 + norm(Z, 'fro')
 
-    converged = False
-    while not converged:
+    converged = np.zeros(m)
+    while (converged == 0).any():
         for i in range(m):
             Z += np.outer(K[:,i], U[i,:])
 
@@ -53,17 +52,15 @@ def umkl_descent(kernels, rho):
             new_obj = obj_term1 + norm(Z, 'fro')
 
             diff = prev_obj - new_obj
-            print diff
             if diff < epsilon:
-                converged = True
-            else:
-                converged = False
+                converged[i] = 1
 
             prev_obj = new_obj
 
 
     
     Phi = new_obj
+    print "Optimal value:", Phi
     weights = [ norm(Z, 'fro')/Phi ]
 
     for i in range(1,m):
@@ -76,4 +73,4 @@ if __name__ == '__main__':
     kernels_file = sys.argv[1]
     kernels = np.load(kernels_file)
     kernels = [k.todense() for k in kernels]
-    weights = umkl_descent(kernels, 0.7)
+    weights = umkl_descent(kernels, 1)

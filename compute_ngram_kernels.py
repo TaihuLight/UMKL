@@ -6,6 +6,7 @@
 #   Argument 2: file name to save kernel matrices
 
 from sklearn.feature_extraction.text import *
+import scipy.io
 import numpy as np
 import sys
 import json
@@ -19,7 +20,7 @@ with open(raw_corpus, 'r') as f:
         corpus.append(json.loads(l)['reviewText'])
 
 # TODO: For now, we'll take a small corpus. Scalability will come later.
-corpus = corpus[:1000]
+corpus = corpus[:100]
 
 # Initialize vectorizers
 unigram_vectorizer = CountVectorizer()
@@ -41,3 +42,4 @@ trigram_kernel = trigram_TM * trigram_TM.T
 
 # Save kernel matrices to npy file
 np.save(kernel_filename, [unigram_kernel, bigram_kernel, trigram_kernel]) 
+scipy.io.savemat('kernels', {'unigram_kernel':unigram_kernel, 'bigram_kernel':bigram_kernel, 'trigram_kernel':trigram_kernel})
