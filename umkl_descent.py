@@ -1,20 +1,21 @@
 from __future__ import division
 import numpy as np
+from scipy.linalg import *
 import sklearn
 import sys
 
 norm = np.linalg.norm
 
-def umkl_descent(kernels, rho, epsilon=0.1):
+def umkl_descent(kernels, rho, epsilon=0.1, p=10):
     n = kernels[0].shape[0]
     
     # Obtain k_i from eigenvalue decompositions 
-    # of given kernels. TODO: Approximate computation
-    w, K = np.linalg.eig(kernels[0])
+    # of given kernels. (Only p largest eigenvalues)
+    w, K = eigh(kernels[0], eigvals=(0,p-1))
     for i in range(K.shape[1]):
         K[:,i] *= w[i]
     for kernel in kernels[1:]:
-        w, v = np.linalg.eig(kernel)
+        w, v = eigh(kernel, eigvals=(0,p-1))
         for i in range(v.shape[1]):
             v[:,i] *= w[i]
         K = np.hstack((K, v))
@@ -30,8 +31,8 @@ def umkl_descent(kernels, rho, epsilon=0.1):
     
     prev_obj = obj_term1 + norm(Z, 'fro')
 
-    converged = np.zeros(m)
-    while (converged == 0).any():
+    diff = prev_obj
+    while abs(diff) > epsilon:
         for i in range(m):
             Z += np.outer(K[:,i], U[i,:])
 
@@ -42,7 +43,7 @@ def umkl_descent(kernels, rho, epsilon=0.1):
             d = (rho**2) - c
             alpha = ( a*d + np.sqrt( (a*d)**2 - a*c*d*( (rho**2)*b - a ) ) ) / (a*c*d)
 
-            # Update objective value
+            # Descend and update objective value
             temp = obj_term1 - rho*norm(U[i,:])
             U[i,:] = alpha * np.dot(K[:,i].T,  Z)
             temp += rho*norm(U[i,:])
@@ -51,26 +52,26 @@ def umkl_descent(kernels, rho, epsilon=0.1):
             Z -= np.outer(K[:,i], U[i,:])
             new_obj = obj_term1 + norm(Z, 'fro')
 
-            diff = prev_obj - new_obj
-            if diff < epsilon:
-                converged[i] = 1
+        diff = prev_obj - new_obj
+        print diff
+        prev_obj = new_obj
 
-            prev_obj = new_obj
-
-
-    
     Phi = new_obj
     print "Optimal value:", Phi
     weights = [ norm(Z, 'fro')/Phi ]
 
-    for i in range(1,m):
+    for i in range(m):
         weights.append( norm(U[i,:])/Phi )
 
-    return weights
+    optimal_kernel = weights[0]*np.eye(n)
+    for i in range(m):
+        optimal_kernel += (rho**(-2)) * weights[i] * np.outer(K[:,i], K[:,i])
+    
+    return optimal_kernel
     
 
 if __name__ == '__main__':
     kernels_file = sys.argv[1]
     kernels = np.load(kernels_file)
     kernels = [k.todense() for k in kernels]
-    weights = umkl_descent(kernels, 1)
+    optimal_kernel = umkl_descent(kernels, 1)

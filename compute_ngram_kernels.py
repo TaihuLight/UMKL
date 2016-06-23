@@ -6,6 +6,7 @@
 #   Argument 2: file name to save kernel matrices
 
 from sklearn.feature_extraction.text import *
+from sklearn.kernel_approximation import Nystroem
 import scipy.io
 import numpy as np
 import sys
@@ -23,11 +24,19 @@ with open(raw_corpus, 'r') as f:
 corpus = corpus[:100]
 
 # Initialize vectorizers
+
+# TODO: Currently TF-IDF transform causes imaginary alpha
+#unigram_vectorizer = TfidfVectorizer()
+#bigram_vectorizer = TfidfVectorizer(ngram_range=(2,2)) 
+#trigram_vectorizer = TfidfVectorizer(ngram_range=(3,3))
+
 unigram_vectorizer = CountVectorizer()
 bigram_vectorizer = CountVectorizer(ngram_range=(2,2)) 
 trigram_vectorizer = CountVectorizer(ngram_range=(3,3))
 
 # Compute Document-term matrices and kernels for ngram representations
+#nystroem = Nystroem(kernel='linear', n_components=?)
+
 print 'Computing unigram kernel'
 unigram_TM = unigram_vectorizer.fit_transform(corpus)
 unigram_kernel = unigram_TM * unigram_TM.T
