@@ -21,7 +21,7 @@ with open(raw_corpus, 'r') as f:
         corpus.append(json.loads(l)['reviewText'])
 
 # TODO: For now, we'll take a small corpus. Scalability will come later.
-corpus = corpus[:100]
+corpus = corpus[:200]
 
 # Initialize vectorizers
 

@@ -7,21 +7,25 @@ import sys
 norm = np.linalg.norm
 
 def umkl_descent(kernels, rho, epsilon=0.1, p=10):
-    n = kernels[0].shape[0]
-    
     # Obtain k_i from eigenvalue decompositions 
     # of given kernels. (Only p largest eigenvalues)
-    w, K = eigh(kernels[0], eigvals=(0,p-1))
+    n = kernels[0].shape[0]
+    q = kernels[0].shape[1]
+    w, K = eigh(kernels[0], eigvals=(q-p,q-1))
     for i in range(K.shape[1]):
         K[:,i] *= w[i]
     for kernel in kernels[1:]:
-        w, v = eigh(kernel, eigvals=(0,p-1))
+        w, v = eigh(kernel, eigvals=(q-p,q-1))
         for i in range(v.shape[1]):
             v[:,i] *= w[i]
         K = np.hstack((K, v))
 
+    # Make sure rho is small enough
     m = K.shape[1]
+    min_k_norm = min([norm(K[:,i]) for i in range(m)])
+    rho = min(rho, 0.5*min_k_norm)
 
+    # Initialize U and compute initial objective value
     U = np.random.randn(m, n)
     obj_term1 = rho*sum([norm(U[i,:]) for i in range(m)])
 
@@ -31,9 +35,12 @@ def umkl_descent(kernels, rho, epsilon=0.1, p=10):
     
     prev_obj = obj_term1 + norm(Z, 'fro')
 
+    # Descent loop
+    objective_values = [prev_obj]
     diff = prev_obj
-    while abs(diff) > epsilon:
+    while diff > epsilon:
         for i in range(m):
+            # Update Z 
             Z += np.outer(K[:,i], U[i,:])
 
             # Actual descent
@@ -42,6 +49,12 @@ def umkl_descent(kernels, rho, epsilon=0.1, p=10):
             c = norm(K[:,i])**2
             d = (rho**2) - c
             alpha = ( a*d + np.sqrt( (a*d)**2 - a*c*d*( (rho**2)*b - a ) ) ) / (a*c*d)
+            if np.isnan(alpha):
+                print "Alpha imaginary."
+                exit(0)
+            if alpha < 0:
+                print "Alpha negative."
+                exit(0)
 
             # Descend and update objective value
             temp = obj_term1 - rho*norm(U[i,:])
@@ -51,10 +64,14 @@ def umkl_descent(kernels, rho, epsilon=0.1, p=10):
 
             Z -= np.outer(K[:,i], U[i,:])
             new_obj = obj_term1 + norm(Z, 'fro')
+            objective_values.append(new_obj)
 
         diff = prev_obj - new_obj
-        print diff
         prev_obj = new_obj
+
+        if diff < 0:
+            print "Objective value increased."
+            exit(0)
 
     Phi = new_obj
     print "Optimal value:", Phi
@@ -63,15 +80,15 @@ def umkl_descent(kernels, rho, epsilon=0.1, p=10):
     for i in range(m):
         weights.append( norm(U[i,:])/Phi )
 
-    optimal_kernel = weights[0]*np.eye(n)
-    for i in range(m):
-        optimal_kernel += (rho**(-2)) * weights[i] * np.outer(K[:,i], K[:,i])
+    #optimal_kernel = weights[0]*np.eye(n)
+    #for i in range(m):
+    #    optimal_kernel += (rho**(-2)) * weights[i] * np.outer(K[:,i], K[:,i])
     
-    return optimal_kernel
+    return weights, objective_values
     
 
 if __name__ == '__main__':
     kernels_file = sys.argv[1]
     kernels = np.load(kernels_file)
     kernels = [k.todense() for k in kernels]
-    optimal_kernel = umkl_descent(kernels, 1)
+    optimal_kernel = umkl_descent(kernels, 0.5)
