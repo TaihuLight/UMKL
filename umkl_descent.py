@@ -2,7 +2,7 @@
 # algorithm for unsupervised multiple-kernel learning.
 # The main script should be run with a .npy file as the
 # command line argument. The .npy file should contain the
-# multiple kernels as a list of sparse scipy matrices.
+# multiple kernels as a collection of sparse scipy matrices.
 
 from __future__ import division
 import numpy as np
