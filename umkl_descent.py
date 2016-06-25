@@ -6,7 +6,7 @@ import sys
 
 norm = np.linalg.norm
 
-def umkl_descent(kernels, rho, epsilon=0.1, p=10):
+def umkl_descent(kernels, rho, epsilon=0.001, p=10):
     # Obtain k_i from eigenvalue decompositions 
     # of given kernels. (Only p largest eigenvalues)
     n = kernels[0].shape[0]
@@ -66,6 +66,7 @@ def umkl_descent(kernels, rho, epsilon=0.1, p=10):
             new_obj = obj_term1 + norm(Z, 'fro')
             objective_values.append(new_obj)
 
+        # Check convergence
         diff = prev_obj - new_obj
         prev_obj = new_obj
 
@@ -73,6 +74,7 @@ def umkl_descent(kernels, rho, epsilon=0.1, p=10):
             print "Objective value increased."
             exit(0)
 
+    # Recover primal variables: optimal weights
     Phi = new_obj
     print "Optimal value:", Phi
     weights = [ norm(Z, 'fro')/Phi ]
@@ -80,6 +82,7 @@ def umkl_descent(kernels, rho, epsilon=0.1, p=10):
     for i in range(m):
         weights.append( rho*norm(U[i,:])/Phi )
 
+    # Compute optimal kernel
     #optimal_kernel = weights[0]*np.eye(n)
     #for i in range(m):
     #    optimal_kernel += (rho**(-2)) * weights[i] * np.outer(K[:,i], K[:,i])
