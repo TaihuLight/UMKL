@@ -78,7 +78,7 @@ def umkl_descent(kernels, rho, epsilon=0.1, p=10):
     weights = [ norm(Z, 'fro')/Phi ]
 
     for i in range(m):
-        weights.append( norm(U[i,:])/Phi )
+        weights.append( rho*norm(U[i,:])/Phi )
 
     #optimal_kernel = weights[0]*np.eye(n)
     #for i in range(m):
