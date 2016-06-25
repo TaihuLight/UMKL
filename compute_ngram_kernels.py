@@ -5,6 +5,7 @@
 # Command line arguments:
 #   Argument 1: json data to parse
 #   Argument 2: file name to save kernel matrices
+#   Argument 3 (optional): Number of documents to take as corpus
 
 from sklearn.feature_extraction.text import *
 from sklearn.kernel_approximation import Nystroem
@@ -22,7 +23,8 @@ with open(raw_corpus, 'r') as f:
         corpus.append(json.loads(l)['reviewText'])
 
 # TODO: For now, we'll take a small corpus. Scalability will come later.
-corpus = corpus[:200]
+if len(sys.argv) > 3:
+    corpus = corpus[:int(sys.argv[3])]
 
 # Initialize vectorizers
 
