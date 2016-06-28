@@ -101,4 +101,4 @@ if __name__ == '__main__':
     kernels_file = sys.argv[1]
     kernels = np.load(kernels_file)
     kernels = [k.todense() for k in kernels]
-    optimal_kernel = umkl_descent(kernels, 0.5)
+    weights, objective_values = umkl_descent(kernels, 0.5)
