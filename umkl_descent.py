@@ -16,6 +16,7 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10):
     # Obtain k_i from eigenvalue decompositions 
     # of given kernels. (Only p largest eigenvalues)
     n = kernels[0].shape[0]
+    print 'Peforming UMKL for ' + str(n) + ' X ' + str(n) + ' kernels.'
     q = kernels[0].shape[1]
     w, K = eigh(kernels[0], eigvals=(q-p,q-1))
     for i in range(K.shape[1]):
