@@ -20,11 +20,11 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10):
     q = kernels[0].shape[1]
     w, K = eigh(kernels[0], eigvals=(q-p,q-1))
     for i in range(K.shape[1]):
-        K[:,i] *= w[i]
+        K[:,i] *= np.sqrt(w[i])
     for kernel in kernels[1:]:
         w, v = eigh(kernel, eigvals=(q-p,q-1))
         for i in range(v.shape[1]):
-            v[:,i] *= w[i]
+            v[:,i] *= np.sqrt(w[i])
         K = np.hstack((K, v))
 
     # Make sure rho is small enough
@@ -101,4 +101,4 @@ if __name__ == '__main__':
     kernels_file = sys.argv[1]
     kernels = np.load(kernels_file)
     kernels = [k.todense() for k in kernels]
-    weights, objective_values = umkl_descent(kernels, 0.5)
+    weights, objective_values = umkl_descent(kernels, 0.2)

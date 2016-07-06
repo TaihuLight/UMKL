@@ -25,6 +25,8 @@ with open(raw_corpus, 'r') as f:
 # TODO: For now, we'll take a small corpus. Scalability will come later.
 if len(sys.argv) > 3:
     corpus = corpus[:int(sys.argv[3])]
+else:
+    corpus = corpus[:100]
 
 # Initialize vectorizers
 

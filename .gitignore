@@ -3,3 +3,5 @@
 *.swp
 *.mat
 *.m~
+/data
+.DS_Store
