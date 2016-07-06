@@ -63,13 +63,16 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10):
             Z += np.outer(K[:,i], U[i,:])
 
             # Actual descent
+            Z_norm = norm(Z)
+            kTZ_norm  = norm(np.dot(K[:,i].T, Z))
+
             alpha_0 = 1.0 / (k_norms[i]**2)
             c = k_norms[i]
-            d = alpha_0 * ( norm(Z)**2 / norm(np.dot(K[:,i].T, Z))**2 - alpha_0 )
+            d = alpha_0 * ( Z_norm**2 / kTZ_norm**2 - alpha_0 )
             alpha = alpha_0 - np.sqrt( (rho**2 * d) / (c**2 - rho**2) )
 
-            f_of_alpha = rho*abs(alpha) * norm(np.dot(K[:,i].T, Z)) + norm( np.dot(np.eye(n) - alpha*np.outer(K[:,i], K[:,i].T), Z) )
-            if norm(Z) < f_of_alpha:
+            f_of_alpha = rho*abs(alpha) * kTZ_norm + norm( np.dot(np.eye(n) - alpha*np.outer(K[:,i], K[:,i].T), Z) )
+            if Z_norm < f_of_alpha:
                 alpha = 0
 
             if np.isnan(alpha):
