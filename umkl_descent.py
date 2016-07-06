@@ -27,10 +27,22 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10):
             v[:,i] *= np.sqrt(w[i])
         K = np.hstack((K, v))
 
-    # Make sure rho is small enough
+    # Normalize K matrix
     m = K.shape[1]
-    min_k_norm = min([norm(K[:,i]) for i in range(m)])
-    rho = min(rho, 0.5*min_k_norm)
+    k_norms = [norm(K[:,i]) for i in range(m)]
+    K /= sum(k_norms)
+
+    # Eliminate k_i with norm < rho
+    to_delete = []
+    for i in range(m):
+        if norm(K[:,i]) < rho:
+            to_delete.append(i)
+    K = np.delete(K, to_delete, 1)
+    m = K.shape[1]
+    if m == 0:
+        print "Rho too large."
+        exit(0)
+    k_norms = [norm(K[:,i]) for i in range(m)]
 
     # Initialize U and compute initial objective value
     U = np.random.randn(m, n)
@@ -40,7 +52,7 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10):
     for i in range(m):
         Z -= np.outer(K[:,i], U[i,:])
     
-    prev_obj = obj_term1 + norm(Z, 'fro')
+    prev_obj = obj_term1 + norm(Z)
 
     # Descent loop
     objective_values = [prev_obj]
@@ -51,11 +63,15 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10):
             Z += np.outer(K[:,i], U[i,:])
 
             # Actual descent
-            a = norm(np.dot(K[:,i].T, Z))**2
-            b = norm(Z, 'fro')**2
-            c = norm(K[:,i])**2
-            d = (rho**2) - c
-            alpha = ( a*d + np.sqrt( (a*d)**2 - a*c*d*( (rho**2)*b - a ) ) ) / (a*c*d)
+            alpha_0 = 1.0 / (k_norms[i]**2)
+            c = k_norms[i]
+            d = alpha_0 * ( norm(Z)**2 / norm(np.dot(K[:,i].T, Z))**2 - alpha_0 )
+            alpha = alpha_0 - np.sqrt( (rho**2 * d) / (c**2 - rho**2) )
+
+            f_of_alpha = rho*abs(alpha) * norm(np.dot(K[:,i].T, Z)) + norm( np.dot(np.eye(n) - alpha*np.outer(K[:,i], K[:,i].T), Z) )
+            if norm(Z) < f_of_alpha:
+                alpha = 0
+
             if np.isnan(alpha):
                 print "Alpha imaginary."
                 exit(0)
@@ -70,7 +86,7 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10):
             obj_term1 = temp
 
             Z -= np.outer(K[:,i], U[i,:])
-            new_obj = obj_term1 + norm(Z, 'fro')
+            new_obj = obj_term1 + norm(Z)
             objective_values.append(new_obj)
 
         # Check convergence
@@ -84,7 +100,7 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10):
     # Recover primal variables: optimal weights
     Phi = new_obj
     print "Optimal value:", Phi
-    weights = [ norm(Z, 'fro')/Phi ]
+    weights = [ norm(Z)/Phi ]
 
     for i in range(m):
         weights.append( rho*norm(U[i,:])/Phi )
@@ -101,4 +117,4 @@ if __name__ == '__main__':
     kernels_file = sys.argv[1]
     kernels = np.load(kernels_file)
     kernels = [k.todense() for k in kernels]
-    weights, objective_values = umkl_descent(kernels, 0.2)
+    weights, objective_values = umkl_descent(kernels, 1e-3)
