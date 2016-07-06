@@ -29,13 +29,15 @@ end
 m = size(K, 2);
 
 cvx_begin
-    variable lambda(m, 1)
+    variable lambda(m, 1);
+    variable theta(n, 1);
     
-    minimize ( trace_inv(combined_kernel(lambda, K, rho)) )
+    minimize ( trace_inv(combined_kernel_reg2(theta, lambda, K, rho)) )
     
-    sum(lambda) == 1;
+    sum(theta) + sum(lambda) == 1;
     lambda >= 0;
+    theta >= 0;
     
 cvx_end
 
-bar(lambda)
+b = bar([theta; lambda]);

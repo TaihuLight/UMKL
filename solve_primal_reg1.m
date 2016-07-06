@@ -29,9 +29,9 @@ end
 m = size(K, 2);
 
 cvx_begin
-    variable lambda(m, 1)
+    variable lambda(m+1, 1)
     
-    minimize ( trace_inv(combined_kernel(lambda, K, rho)) )
+    minimize ( trace_inv(combined_kernel_reg1(lambda, K, rho)) )
     
     sum(lambda) == 1;
     lambda >= 0;
