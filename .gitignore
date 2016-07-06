@@ -3,5 +3,5 @@
 *.swp
 *.mat
 *.m~
-/data
+data
 .DS_Store
