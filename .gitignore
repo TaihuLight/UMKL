@@ -5,4 +5,5 @@
 *.mat
 *.m~
 data
+plots
 .DS_Store

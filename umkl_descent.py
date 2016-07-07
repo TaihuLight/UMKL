@@ -31,7 +31,7 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10):
     m = K.shape[1]
     k_norms = [norm(K[:,i]) for i in range(m)]
     K /= sum(k_norms)
-
+    
     # Eliminate k_i with norm < rho
     to_delete = []
     for i in range(m):
@@ -120,4 +120,5 @@ if __name__ == '__main__':
     kernels_file = sys.argv[1]
     kernels = np.load(kernels_file)
     kernels = [k.todense() for k in kernels]
-    weights, objective_values = umkl_descent(kernels, 1e-3)
+    weights, objective_values = umkl_descent(kernels, 0.05)
+

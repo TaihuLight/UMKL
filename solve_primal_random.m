@@ -5,7 +5,7 @@ K1 = eye(n) + normrnd(0, 0.1, n, n);
 K2 = eye(n) + normrnd(0, 0.5, n, n);
 K = [K1, K2];
 
-rho = 1/20;
+rho = 0.05;
 m = size(K, 2);
 
 cvx_begin
