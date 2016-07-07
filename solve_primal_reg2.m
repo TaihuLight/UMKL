@@ -11,8 +11,8 @@ C = rand(n, n);
 kernels = {A'*A, B'*B, C'*C};
 
 %% Solve the primal problem
-p = 10;
-rho = 1;
+p = 30;
+rho = 0.1;
 
 [K, D] = eigs(kernels{1}, p);
 for i = 1:size(K, 2)
