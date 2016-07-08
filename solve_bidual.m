@@ -18,36 +18,41 @@ for i = 2:size(kernels, 2)
 end
 m = size(K, 2);
 
-%% Load experimental random data
+%% Load random kernel vectors
 load('random_kernel.mat')
 rho = 0.05;
+
+%% Sovle bidual
 n = size(K, 1);
 m = size(K, 2);
 
-%% Solve dual SOCP
 cvx_begin
-    variable B(n, n)
+    variable U(m,n);
+    variable V(n,n);
     
-    maximize ( trace(B) )
-    
-    norm(B, 'fro') <= 1;
-    for i = 1:size(K, 2)
-        norm(K(:,i)' * B, 'fro') <= rho;
+    t1 = 0;
+    for i = 1:m
+        t1 = t1 + norm(U(i,:));
     end
+    
+    t2 = eye(n);
+    for i = 1:m
+        t2 = t2 - K(:,i) * U(i,:);
+    end
+    
+    minimize ( rho * t1 + norm(V) )
+    V == t2;
     
 cvx_end
 
 %% Recover primal weights
+lambda = zeros(m+1,1);
+lambda(1) = (1/cvx_optval) * norm(V);
+for i = 1:m
+    lambda(i+1) = (rho/cvx_optval) * norm(U(i,:));
+end
 
-C = (1/cvx_optval) * inv(B);
+bar(lambda);
 
-cvx_begin
-    variable lambda(m+1, 1);
+
     
-    minimize ( norm(combined_kernel_reg1(lambda, K, rho) - C) );
-    lambda >= 0;
-    sum(lambda) == 1;
-    
-cvx_end
-
-bar(lambda)
