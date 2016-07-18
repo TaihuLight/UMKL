@@ -12,7 +12,7 @@ kernels = {A'*A, B'*B, C'*C};
 
 %% Solve the primal problem
 p = 10;
-rho = 1;
+rho = 0.05;
 
 [K, D] = eigs(kernels{1}, p);
 for i = 1:size(K, 2)

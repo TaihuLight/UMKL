@@ -3,7 +3,7 @@ load 'kernels.mat'
 kernels = {unigram_kernel, bigram_kernel, trigram_kernel};
 n = size(unigram_kernel, 1);
 p = 10;
-rho = 1;
+rho = 0.05;
 
 [K, D] = eigs(kernels{1}, p);
 for i = 1:size(K, 2)
