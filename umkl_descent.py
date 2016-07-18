@@ -41,11 +41,11 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10):
     m = K.shape[1]
     if m == 0:
         print "Rho too large."
-        exit(0)
+        return
     k_norms = [norm(K[:,i]) for i in range(m)]
 
     # Initialize U and compute initial objective value
-    U = np.random.randn(m, n)
+    U = np.zeros((m, n))
     obj_term1 = rho*sum([norm(U[i,:]) for i in range(m)])
 
     Z = np.eye(n)
@@ -120,5 +120,5 @@ if __name__ == '__main__':
     kernels_file = sys.argv[1]
     kernels = np.load(kernels_file)
     kernels = [k.todense() for k in kernels]
-    weights, objective_values = umkl_descent(kernels, 0.05, epsilon=1e-6)
+    weights, objective_values = umkl_descent(kernels, 0.01)
 
