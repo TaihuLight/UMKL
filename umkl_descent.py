@@ -128,5 +128,4 @@ if __name__ == '__main__':
     weights, objective_values = umkl_descent(0.01, epsilon=1e-8)
     plt.bar(range(len(weights)), weights)
     plt.show()
-    
 
