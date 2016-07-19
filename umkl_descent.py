@@ -13,11 +13,10 @@ import matplotlib.pyplot as plt
 
 norm = np.linalg.norm
 
-# Experimental code where K is a fixed concatenation of an
-# identity matrix, a noisy identity matrix, and an even
-# noisier identity matrix.
+# Experimental code where K is a fixed concatenation of a
+# noisy identity matrix and an even noisier identity matrix.
 
-def umkl_descent(rho, epsilon=0.001):
+def umkl_descent(rho, sigma, epsilon=0.001):
     # Obtain k_i from eigenvalue decompositions 
     # of given kernels. (Only p largest eigenvalues)
     #n = kernels[0].shape[0]
@@ -56,7 +55,8 @@ def umkl_descent(rho, epsilon=0.001):
     U = np.zeros((m, n))
     obj_term1 = rho*sum([norm(U[i,:]) for i in range(m)])
 
-    Z = np.eye(n)
+    Z = np.vstack((np.eye(n), np.zeros((m, n))))
+    K = np.vstack((K, sigma*np.eye(m)))
     for i in range(m):
         Z -= np.outer(K[:,i], U[i,:])
     
@@ -79,7 +79,7 @@ def umkl_descent(rho, epsilon=0.001):
             d = alpha_0 * ( Z_norm**2 / kTZ_norm**2 - alpha_0 )
             alpha = alpha_0 - np.sqrt( (rho**2 * d) / (c**2 - rho**2) )
 
-            f_of_alpha = rho*abs(alpha) * kTZ_norm + norm( np.dot(np.eye(n) - alpha*np.outer(K[:,i], K[:,i].T), Z) )
+            f_of_alpha = rho*abs(alpha) * kTZ_norm + norm( np.dot(np.eye(m+n) - alpha*np.outer(K[:,i], K[:,i].T), Z) )
             if Z_norm < f_of_alpha:
                 alpha = 0
 
@@ -125,7 +125,9 @@ def umkl_descent(rho, epsilon=0.001):
     
 
 if __name__ == '__main__':
-    weights, objective_values = umkl_descent(0.01, epsilon=1e-8)
+    rho = 0.01
+    sigma = rho/10.0
+    weights, objective_values = umkl_descent(rho, sigma, epsilon=1e-8)
     plt.bar(range(len(weights)), weights)
     plt.show()
     

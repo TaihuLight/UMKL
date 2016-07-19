@@ -1,10 +1,6 @@
 % Experiment: solve the primal problem with perturbed basis vectors
 n = 10;
 
-% K1 = eye(n) + normrnd(0, 0.1, n, n);
-% K2 = eye(n) + normrnd(0, 0.5, n, n);
-% K = [K1, K2];
-
 load('random_kernel.mat')
 rho = 0.01;
 m = size(K, 2);
