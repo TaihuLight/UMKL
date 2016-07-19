@@ -9,23 +9,31 @@ import numpy as np
 from scipy.linalg import *
 import sklearn
 import sys
+import matplotlib.pyplot as plt
 
 norm = np.linalg.norm
 
-def umkl_descent(kernels, rho, epsilon=0.001, p=10):
+# Experimental code where K is a fixed concatenation of an
+# identity matrix, a noisy identity matrix, and an even
+# noisier identity matrix.
+
+def umkl_descent(rho, epsilon=0.001):
     # Obtain k_i from eigenvalue decompositions 
     # of given kernels. (Only p largest eigenvalues)
-    n = kernels[0].shape[0]
-    print 'Peforming UMKL for ' + str(n) + ' X ' + str(n) + ' kernels.'
-    q = kernels[0].shape[1]
-    w, K = eigh(kernels[0], eigvals=(q-p,q-1))
-    for i in range(K.shape[1]):
-        K[:,i] *= np.sqrt(w[i])
-    for kernel in kernels[1:]:
-        w, v = eigh(kernel, eigvals=(q-p,q-1))
-        for i in range(v.shape[1]):
-            v[:,i] *= np.sqrt(w[i])
-        K = np.hstack((K, v))
+    #n = kernels[0].shape[0]
+    #print 'Peforming UMKL for ' + str(n) + ' X ' + str(n) + ' kernels.'
+    #q = kernels[0].shape[1]
+    #w, K = eigh(kernels[0], eigvals=(q-p,q-1))
+    #for i in range(K.shape[1]):
+    #    K[:,i] *= np.sqrt(w[i])
+    #for kernel in kernels[1:]:
+    #    w, v = eigh(kernel, eigvals=(q-p,q-1))
+    #    for i in range(v.shape[1]):
+    #        v[:,i] *= np.sqrt(w[i])
+    #    K = np.hstack((K, v))
+
+    K = np.load('random_kernel.npy')
+    n = K.shape[0]
 
     # Normalize K matrix
     m = K.shape[1]
@@ -117,8 +125,8 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10):
     
 
 if __name__ == '__main__':
-    kernels_file = sys.argv[1]
-    kernels = np.load(kernels_file)
-    kernels = [k.todense() for k in kernels]
-    weights, objective_values = umkl_descent(kernels, 0.01)
+    weights, objective_values = umkl_descent(0.01, epsilon=1e-8)
+    plt.bar(range(len(weights)), weights)
+    plt.show()
+    
 

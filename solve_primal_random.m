@@ -6,7 +6,7 @@ n = 10;
 % K = [K1, K2];
 
 load('random_kernel.mat')
-rho = 0.05;
+rho = 0.01;
 m = size(K, 2);
 
 cvx_begin
