@@ -20,28 +20,30 @@ m = size(K, 2);
 
 %% Load random kernel vectors
 load('random_kernel.mat')
-rho = 0.05;
+rho = 0.01;
 
 %% Sovle bidual
 n = size(K, 1);
 m = size(K, 2);
+sigma = rho/10;
+K = [K; sigma*eye(m)];
 
 cvx_begin
     variable U(m,n);
-    variable V(n,n);
     
     t1 = 0;
     for i = 1:m
         t1 = t1 + norm(U(i,:));
     end
     
-    t2 = eye(n);
+    t2 = [eye(n); zeros(m,n)];
+    %t2 = eye(n);
+    
     for i = 1:m
         t2 = t2 - K(:,i) * U(i,:);
     end
     
-    minimize ( rho * t1 + norm(V) )
-    V == t2;
+    minimize ( rho * t1 + norm(t2) )
     
 cvx_end
 

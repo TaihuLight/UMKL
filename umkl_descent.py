@@ -126,9 +126,9 @@ def umkl_descent(rho, sigma, epsilon=0.001):
 
 if __name__ == '__main__':
     rho = 0.01
-    sigma = rho/10.0
+    sigma = rho/50.0
     weights, objective_values = umkl_descent(rho, sigma, epsilon=1e-8)
     plt.bar(range(len(weights)), weights)
-    plt.show()
+    plt.savefig('plots/exp4.png')
     
 
