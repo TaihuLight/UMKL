@@ -7,6 +7,7 @@
 from __future__ import division
 import numpy as np
 from scipy.linalg import *
+import scipy.io
 import sklearn
 import sys
 import matplotlib.pyplot as plt
@@ -126,9 +127,8 @@ def umkl_descent(rho, sigma, epsilon=0.001):
 
 if __name__ == '__main__':
     rho = 0.01
-    sigma = rho/50.0
+    sigma = rho/20.0
     weights, objective_values = umkl_descent(rho, sigma, epsilon=1e-8)
-    plt.bar(range(len(weights)), weights)
-    plt.savefig('plots/exp4.png')
-    
+    #plt.bar(range(len(weights)), weights)
+    scipy.io.savemat('solutions/python_sol_20', {'lambda':weights})
 

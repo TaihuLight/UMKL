@@ -25,7 +25,7 @@ rho = 0.01;
 %% Sovle bidual
 n = size(K, 1);
 m = size(K, 2);
-sigma = rho/10;
+sigma = rho/20;
 K = [K; sigma*eye(m)];
 
 cvx_begin
@@ -49,7 +49,7 @@ cvx_end
 
 %% Recover primal weights
 lambda = zeros(m+1,1);
-lambda(1) = (1/cvx_optval) * norm(V);
+lambda(1) = (1/cvx_optval) * norm(t2);
 for i = 1:m
     lambda(i+1) = (rho/cvx_optval) * norm(U(i,:));
 end
