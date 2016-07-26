@@ -1,5 +1,5 @@
 %% Use precomputed kernels from Amazon reviews
-load 'kernels.mat'
+load 'data/kernels.mat'
 kernels = {unigram_kernel, bigram_kernel, trigram_kernel};
 n = size(unigram_kernel, 1);
 

@@ -1,5 +1,5 @@
 %% Load data from Amazon reviews
-load 'kernels.mat'
+load 'data/kernels.mat'
 kernels = {unigram_kernel, bigram_kernel, trigram_kernel};
 n = size(unigram_kernel, 1);
 p = 10;
@@ -19,7 +19,7 @@ end
 m = size(K, 2);
 
 %% Load experimental random data
-load('random_kernel.mat')
+load('data/random_kernel.mat')
 rho = 0.05;
 n = size(K, 1);
 m = size(K, 2);

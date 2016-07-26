@@ -1,5 +1,5 @@
 %% Load data from Amazon reviews
-load 'kernels.mat'
+load 'data/kernels.mat'
 kernels = {unigram_kernel, bigram_kernel, trigram_kernel};
 n = size(unigram_kernel, 1);
 p = 10;
@@ -19,15 +19,18 @@ end
 m = size(K, 2);
 
 %% Load random kernel vectors
-load('random_kernel.mat')
+load('data/random_kernel.mat')
 rho = 0.01;
-
-%% Sovle bidual
 n = size(K, 1);
 m = size(K, 2);
+y = eye(n);
+
+%% Augment matrices if desired
 sigma = rho/20;
 K = [K; sigma*eye(m)];
+y = [eye(n); zeros(m,n)];
 
+%% Solve bidual
 cvx_begin
     variable U(m,n);
     
@@ -36,8 +39,7 @@ cvx_begin
         t1 = t1 + norm(U(i,:));
     end
     
-    t2 = [eye(n); zeros(m,n)];
-    %t2 = eye(n);
+    t2 = y;
     
     for i = 1:m
         t2 = t2 - K(:,i) * U(i,:);
