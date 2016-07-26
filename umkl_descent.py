@@ -45,7 +45,7 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10, sigma=None):
     k_norms = [norm(K[:,i]) for i in range(m)]
 
     # Initialize U and compute initial objective value
-    U = np.random.randn(m, n)
+    U = np.zeros((m, n))
     obj_term1 = rho*sum([norm(U[i,:]) for i in range(m)])
 
     Z = np.eye(n)
