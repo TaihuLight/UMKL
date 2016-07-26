@@ -12,7 +12,7 @@ import sys
 
 norm = np.linalg.norm
 
-def umkl_descent(kernels, rho, epsilon=0.001, p=10):
+def umkl_descent(kernels, rho, epsilon=0.001, p=10, sigma=None):
     # Obtain k_i from eigenvalue decompositions 
     # of given kernels. (Only p largest eigenvalues)
     n = kernels[0].shape[0]
@@ -49,6 +49,13 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10):
     obj_term1 = rho*sum([norm(U[i,:]) for i in range(m)])
 
     Z = np.eye(n)
+    Id = np.eye(n)
+
+    if sigma is not None:
+        Z = np.vstack((Z, np.zeros((m, n))))
+        K = np.vstack((K, sigma*np.eye(m)))
+        Id = np.eye(m+n)
+    
     for i in range(m):
         Z -= np.outer(K[:,i], U[i,:])
     
@@ -71,7 +78,7 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10):
             d = alpha_0 * ( Z_norm**2 / kTZ_norm**2 - alpha_0 )
             alpha = alpha_0 - np.sqrt( (rho**2 * d) / (c**2 - rho**2) )
 
-            f_of_alpha = rho*abs(alpha) * kTZ_norm + norm( np.dot(np.eye(n) - alpha*np.outer(K[:,i], K[:,i].T), Z) )
+            f_of_alpha = rho*abs(alpha) * kTZ_norm + norm( np.dot(Id - alpha*np.outer(K[:,i], K[:,i].T), Z) )
             if Z_norm < f_of_alpha:
                 alpha = 0
 
@@ -120,5 +127,7 @@ if __name__ == '__main__':
     kernels_file = sys.argv[1]
     kernels = np.load(kernels_file)
     kernels = [k.todense() for k in kernels]
-    weights, objective_values = umkl_descent(kernels, 0.05, epsilon=1e-6)
+    r = 0.01
+    s = r/20.0
+    weights, objective_values = umkl_descent(kernels, rho=r, epsilon=1e-6, sigma=s)
 
