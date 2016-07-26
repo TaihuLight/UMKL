@@ -10,7 +10,7 @@ B = rand(n, n);
 C = rand(n, n);
 kernels = {A'*A, B'*B, C'*C};
 
-%% Solve the primal problem
+%% Decompose kernel matrices
 p = 10;
 rho = 0.05;
 
@@ -26,8 +26,13 @@ for i = 2:size(kernels, 2)
     K = [K, V];
 end
 
+%% Load previously generated random kernel vectors
+n = 10;
+load('random_kernel.mat')
+rho = 0.05;
 m = size(K, 2);
 
+%% Sovle primal problem
 cvx_begin
     variable lambda(m+1, 1)
     

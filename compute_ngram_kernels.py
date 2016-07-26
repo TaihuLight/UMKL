@@ -55,4 +55,10 @@ trigram_TM = trigram_vectorizer.fit_transform(corpus)
 trigram_kernel = trigram_TM * trigram_TM.T
 
 # Save kernel matrices to npy file
-np.save(kernel_filename, [unigram_kernel, bigram_kernel, trigram_kernel]) 
+if kernel_filename[-4:] == '.npy':
+    np.save(kernel_filename, [unigram_kernel, bigram_kernel, trigram_kernel]) 
+
+# Save kernel matrices to mat file
+if kernel_filename[-4:] == '.mat':
+    scipy.io.savemat('kernels', {'unigram_kernel':unigram_kernel, 'bigram_kernel':bigram_kernel, 'trigram_kernel':trigram_kernel})
+
