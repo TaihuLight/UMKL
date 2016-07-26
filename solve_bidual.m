@@ -17,6 +17,7 @@ for i = 2:size(kernels, 2)
     K = [K, V];
 end
 m = size(K, 2);
+y = eye(n);
 
 %% Load random kernel vectors
 load('data/random_kernel.mat')
