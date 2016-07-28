@@ -7,6 +7,7 @@
 from __future__ import division
 import numpy as np
 from scipy.linalg import *
+import scipy.io
 import sklearn
 import sys
 import matplotlib.pyplot as plt
@@ -32,7 +33,7 @@ def umkl_descent(rho, epsilon=0.001):
     #        v[:,i] *= np.sqrt(w[i])
     #    K = np.hstack((K, v))
 
-    K = np.load('random_kernel.npy')
+    K = np.load('data/random_kernel.npy')
     n = K.shape[0]
 
     # Normalize K matrix
@@ -128,4 +129,5 @@ if __name__ == '__main__':
     weights, objective_values = umkl_descent(0.01, epsilon=1e-8)
     plt.bar(range(len(weights)), weights)
     plt.show()
+    scipy.io.savemat('solutions/python_nosigma', {'lambda':weights})
 

@@ -19,8 +19,8 @@ end
 m = size(K, 2);
 
 %% Load random kernel vectors
-load('random_kernel.mat')
-rho = 0.05;
+load('data/random_kernel.mat')
+rho = 0.01;
 
 %% Sovle bidual
 n = size(K, 1);
