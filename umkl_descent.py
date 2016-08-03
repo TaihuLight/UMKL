@@ -9,6 +9,7 @@ import numpy as np
 from scipy.linalg import *
 import sklearn
 import sys
+import matplotlib.pyplot as plt
 
 norm = np.linalg.norm
 
@@ -132,4 +133,6 @@ if __name__ == '__main__':
     r = 0.01
     s = r/20.0
     weights, objective_values = umkl_descent(kernels, rho=r, epsilon=1e-6, sigma=s)
+    plt.bar(range(len(weights)), weights)
+    plt.show()
 
