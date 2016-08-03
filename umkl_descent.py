@@ -116,9 +116,11 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10, sigma=None):
         weights.append( rho*norm(U[i,:])/Phi )
 
     # Compute optimal kernel
-    #optimal_kernel = weights[0]*np.eye(n)
-    #for i in range(m):
-    #    optimal_kernel += (rho**(-2)) * weights[i] * np.outer(K[:,i], K[:,i])
+    if sigma is not None:
+        K = K[:n,:]
+    optimal_kernel = weights[0]*np.eye(n)
+    for i in range(m):
+        optimal_kernel += (rho**(-2)) * weights[i] * np.outer(K[:,i], K[:,i])
     
     return weights, objective_values
     
