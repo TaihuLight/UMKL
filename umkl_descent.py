@@ -13,11 +13,10 @@ import matplotlib.pyplot as plt
 
 norm = np.linalg.norm
 
-def umkl_descent(kernels, rho, epsilon=0.001, p=10, sigma=None):
+def dyad_library(kernels, p=10):
     # Obtain k_i from eigenvalue decompositions 
     # of given kernels. (Only p largest eigenvalues)
     n = kernels[0].shape[0]
-    print 'Peforming UMKL for ' + str(n) + ' X ' + str(n) + ' kernels.'
     q = kernels[0].shape[1]
     w, K = eigh(kernels[0], eigvals=(q-p,q-1))
     for i in range(K.shape[1]):
@@ -32,7 +31,13 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10, sigma=None):
     m = K.shape[1]
     k_norms = [norm(K[:,i]) for i in range(m)]
     K /= sum(k_norms)
-    
+    return K
+
+def umkl_descent(K, rho, epsilon=0.001, sigma=None):
+    n = K.shape[0]
+    m = K.shape[1]
+    print 'Peforming UMKL for ' + str(n) + ' X ' + str(n) + ' kernels.'
+
     # Eliminate k_i with norm < rho
     to_delete = []
     for i in range(m):
@@ -122,17 +127,24 @@ def umkl_descent(kernels, rho, epsilon=0.001, p=10, sigma=None):
     optimal_kernel = weights[0]*np.eye(n)
     for i in range(m):
         optimal_kernel += (rho**(-2)) * weights[i] * np.outer(K[:,i], K[:,i])
+
+    trace = np.trace(np.linalg.inv(optimal_kernel))
     
-    return weights, objective_values
+    return weights, trace, objective_values
     
 
 if __name__ == '__main__':
     kernels_file = sys.argv[1]
     kernels = np.load(kernels_file)
     kernels = [k.todense() for k in kernels]
+
+    #K = dyad_library(kernels)
+    K = np.load('data/random_kernel.npy')
+    
     r = 0.01
     s = r/20.0
-    weights, objective_values = umkl_descent(kernels, rho=r, epsilon=1e-6, sigma=s)
-    plt.bar(range(len(weights)), weights)
-    plt.show()
+    weights, trace, objective_values = umkl_descent(K, rho=r, epsilon=1e-6, sigma=s)
+    print 'Tr(K^-1): ', trace
+    #plt.bar(range(len(weights)), weights)
+    #plt.show()
 
