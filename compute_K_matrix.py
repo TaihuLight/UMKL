@@ -9,7 +9,8 @@ else:
     exit(0)
 
 corpus = corpus[:100]
+p = 10
 kernels = compute_ngram_kernels(corpus, 3)
-K = dyad_library(kernels)
+K = dyad_library(kernels, p)
 np.save(sys.argv[2], K)
 
