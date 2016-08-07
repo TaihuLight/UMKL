@@ -32,7 +32,7 @@ def umkl_descent(rho, sigma, epsilon=0.001):
     #        v[:,i] *= np.sqrt(w[i])
     #    K = np.hstack((K, v))
 
-    K = np.load('random_kernel.npy')
+    K = np.load('data/random_kernel.npy')
     n = K.shape[0]
 
     # Normalize K matrix
@@ -129,6 +129,7 @@ if __name__ == '__main__':
     rho = 0.01
     sigma = rho/20.0
     weights, objective_values = umkl_descent(rho, sigma, epsilon=1e-8)
-    #plt.bar(range(len(weights)), weights)
-    scipy.io.savemat('solutions/python_sol_20', {'lambda':weights})
+    plt.bar(range(len(weights)), weights)
+    plt.show()
+    #scipy.io.savemat('solutions/python_sol_20', {'lambda':weights})
 
