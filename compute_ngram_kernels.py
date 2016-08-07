@@ -31,13 +31,13 @@ else:
 # Initialize vectorizers
 
 # TODO: Currently TF-IDF transform causes negative alpha
-#unigram_vectorizer = TfidfVectorizer()
-#bigram_vectorizer = TfidfVectorizer(ngram_range=(2,2)) 
-#trigram_vectorizer = TfidfVectorizer(ngram_range=(3,3))
+unigram_vectorizer = TfidfVectorizer()
+bigram_vectorizer = TfidfVectorizer(ngram_range=(2,2)) 
+trigram_vectorizer = TfidfVectorizer(ngram_range=(3,3))
 
-unigram_vectorizer = CountVectorizer()
-bigram_vectorizer = CountVectorizer(ngram_range=(2,2)) 
-trigram_vectorizer = CountVectorizer(ngram_range=(3,3))
+#unigram_vectorizer = CountVectorizer()
+#bigram_vectorizer = CountVectorizer(ngram_range=(2,2)) 
+#trigram_vectorizer = CountVectorizer(ngram_range=(3,3))
 
 # Compute Document-term matrices and kernels for ngram representations
 #nystroem = Nystroem(kernel='linear', n_components=?)

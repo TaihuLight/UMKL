@@ -134,9 +134,9 @@ def umkl_descent(K, rho, epsilon=0.001, sigma=None):
     
 
 if __name__ == '__main__':
-    kernels_file = sys.argv[1]
-    kernels = np.load(kernels_file)
-    kernels = [k.todense() for k in kernels]
+    #kernels_file = sys.argv[1]
+    #kernels = np.load(kernels_file)
+    #kernels = [k.todense() for k in kernels]
 
     #K = dyad_library(kernels)
     K = np.load('data/random_kernel.npy')
@@ -145,6 +145,6 @@ if __name__ == '__main__':
     s = r/20.0
     weights, trace, objective_values = umkl_descent(K, rho=r, epsilon=1e-6, sigma=s)
     print 'Tr(K^-1): ', trace
-    #plt.bar(range(len(weights)), weights)
-    #plt.show()
+    plt.bar(range(len(weights)), weights)
+    plt.show()
 
