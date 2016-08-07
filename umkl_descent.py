@@ -113,7 +113,7 @@ def umkl_descent(K, rho, epsilon=0.001, sigma=None):
     return weights, trace, objective_values
     
 if __name__ == '__main__':
-    K = np.load(sys.argv[0])
+    K = np.load(sys.argv[1])
     r = 0.01
     s = r/20.0
     weights, trace, objective_values = umkl_descent(K, rho=r, epsilon=1e-6, sigma=None)

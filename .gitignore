@@ -4,6 +4,7 @@
 *.swp
 *.mat
 *.m~
+*.pyc
 data
 plots
 .DS_Store
