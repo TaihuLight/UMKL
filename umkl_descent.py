@@ -1,8 +1,5 @@
 # The function umkl_descent implements a coordinate descent
 # algorithm for unsupervised multiple-kernel learning.
-# The main script should be run with a .npy file as the
-# command line argument. The .npy file should contain the
-# multiple kernels as a collection of sparse scipy matrices.
 
 from __future__ import division
 import numpy as np
@@ -13,29 +10,12 @@ import matplotlib.pyplot as plt
 
 norm = np.linalg.norm
 
-def dyad_library(kernels, p=10):
-    # Obtain k_i from eigenvalue decompositions 
-    # of given kernels. (Only p largest eigenvalues)
-    n = kernels[0].shape[0]
-    q = kernels[0].shape[1]
-    w, K = eigh(kernels[0], eigvals=(q-p,q-1))
-    for i in range(K.shape[1]):
-        K[:,i] *= np.sqrt(w[i])
-    for kernel in kernels[1:]:
-        w, v = eigh(kernel, eigvals=(q-p,q-1))
-        for i in range(v.shape[1]):
-            v[:,i] *= np.sqrt(w[i])
-        K = np.hstack((K, v))
-
+def umkl_descent(K, rho, epsilon=0.001, sigma=None):
     # Normalize K matrix
+    n = K.shape[0]
     m = K.shape[1]
     k_norms = [norm(K[:,i]) for i in range(m)]
     K /= sum(k_norms)
-    return K
-
-def umkl_descent(K, rho, epsilon=0.001, sigma=None):
-    n = K.shape[0]
-    m = K.shape[1]
     print 'Peforming UMKL for ' + str(n) + ' X ' + str(n) + ' kernels.'
 
     # Eliminate k_i with norm < rho
@@ -132,15 +112,8 @@ def umkl_descent(K, rho, epsilon=0.001, sigma=None):
     
     return weights, trace, objective_values
     
-
 if __name__ == '__main__':
-    #kernels_file = sys.argv[1]
-    #kernels = np.load(kernels_file)
-    #kernels = [k.todense() for k in kernels]
-
-    #K = dyad_library(kernels)
-    K = np.load('data/random_kernel.npy')
-    
+    K = np.load(sys.argv[0])
     r = 0.01
     s = r/20.0
     weights, trace, objective_values = umkl_descent(K, rho=r, epsilon=1e-6, sigma=None)
