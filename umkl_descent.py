@@ -35,7 +35,7 @@ def umkl_descent(K, rho, epsilon=0.001, sigma=None):
     obj_term1 = rho*sum([norm(U[i,:]) for i in range(m)])
 
     if sigma is not None:
-        Z = np.vstack((Z, np.zeros((m, n))))
+        Z = np.vstack((np.eye(n), np.zeros((m, n))))
         K = np.vstack((K, sigma*np.eye(m)))
         Id = np.eye(m+n)
     else:
@@ -56,8 +56,12 @@ def umkl_descent(K, rho, epsilon=0.001, sigma=None):
             Z += np.outer(K[:,i], U[i,:])
 
             # Actual descent
-            Z_norm = norm(Z)
             kTZ_norm  = norm(np.dot(K[:,i].T, Z))
+            if kTZ_norm < 1e-6:
+                U[i,:] = 0
+                continue
+
+            Z_norm = norm(Z)
 
             alpha_0 = 1.0 / (k_norms[i]**2)
             c = k_norms[i]
@@ -115,8 +119,8 @@ def umkl_descent(K, rho, epsilon=0.001, sigma=None):
 if __name__ == '__main__':
     K = np.load(sys.argv[1])
     r = 0.01
-    s = r/20.0
-    weights, trace, objective_values = umkl_descent(K, rho=r, epsilon=1e-6, sigma=None)
+    s = r/50.0
+    weights, trace, objective_values = umkl_descent(K, rho=r, epsilon=1e-6, sigma=s)
     print 'Tr(K^-1): ', trace
     plt.bar(range(len(weights)), weights)
     plt.show()
