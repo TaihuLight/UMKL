@@ -107,8 +107,10 @@ def umkl_descent(K, rho, epsilon=0.001, sigma=None):
 
     # Compute optimal kernel
     if sigma is not None:
-        K = K[:n,:]
-    optimal_kernel = weights[0]*np.eye(n)
+        optimal_kernel = weights[0]*np.eye(n+m)
+    else:
+        optimal_kernel = weights[0]*np.eye(n)
+        
     for i in range(m):
         optimal_kernel += (rho**(-2)) * weights[i+1] * np.outer(K[:,i], K[:,i])
     
@@ -120,7 +122,7 @@ if __name__ == '__main__':
     K = np.load(sys.argv[1])
     r = 0.01
     s = r/50.0
-    weights, trace, objective_values = umkl_descent(K, rho=r, epsilon=1e-6, sigma=s)
+    weights, trace, objective_values = umkl_descent(K, rho=r, epsilon=1e-8, sigma=s)
     print 'Tr(K^-1): ', trace
     plt.bar(range(len(weights)), weights)
     plt.show()

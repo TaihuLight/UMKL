@@ -21,7 +21,7 @@ y = eye(n);
 
 %% Load random kernel vectors
 load('data/random_kernel.mat')
-rho = 0.05;
+rho = 0.01;
 n = size(K, 1);
 m = size(K, 2);
 y = eye(n);

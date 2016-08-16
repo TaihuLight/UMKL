@@ -28,8 +28,8 @@ end
 
 %% Load previously generated random kernel vectors
 n = 10;
-load('random_kernel.mat')
-rho = 0.05;
+load('data/random_kernel.mat')
+rho = 0.01;
 m = size(K, 2);
 
 %% Sovle primal problem
