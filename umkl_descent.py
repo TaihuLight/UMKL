@@ -16,7 +16,7 @@ def umkl_descent(K, rho, epsilon=0.001, sigma=None):
     m = K.shape[1]
     k_norms = [norm(K[:,i]) for i in range(m)]
     K /= sum(k_norms)
-    print 'Peforming UMKL for ' + str(n) + ' X ' + str(n) + ' kernels.'
+    print 'Peforming UMKL for ' + str(m) + ' kernels of dimension ' + str(n)
 
     # Eliminate k_i with norm < rho
     to_delete = []
@@ -110,9 +110,9 @@ def umkl_descent(K, rho, epsilon=0.001, sigma=None):
         K = K[:n,:]
     optimal_kernel = weights[0]*np.eye(n)
     for i in range(m):
-        optimal_kernel += (rho**(-2)) * weights[i] * np.outer(K[:,i], K[:,i])
-
-    trace = np.trace(np.linalg.inv(optimal_kernel))
+        optimal_kernel += (rho**(-2)) * weights[i+1] * np.outer(K[:,i], K[:,i])
+    
+    trace = sum( [(1.0/eig) for eig in np.linalg.eig(optimal_kernel)[0]] )
     
     return weights, trace, objective_values
     
