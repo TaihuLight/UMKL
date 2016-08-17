@@ -30,6 +30,7 @@ end
 n = 10;
 load('data/random_kernel.mat')
 rho = 0.01;
+sigma = rho/20;
 m = size(K, 2);
 
 %% Sovle primal problem

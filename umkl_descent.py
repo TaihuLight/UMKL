@@ -114,7 +114,7 @@ def umkl_descent(K, rho, epsilon=0.001, sigma=None):
     for i in range(m):
         optimal_kernel += (rho**(-2)) * weights[i+1] * np.outer(K[:,i], K[:,i])
     
-    trace = sum( [(1.0/eig) for eig in np.linalg.eig(optimal_kernel)[0]] )
+    trace = sum( np.real(1.0/(np.linalg.eig(optimal_kernel)[0])) )
     
     return weights, trace, objective_values
     
